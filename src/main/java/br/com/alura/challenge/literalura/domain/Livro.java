@@ -23,6 +23,7 @@ public class Livro {
     @Column(unique = true, nullable = false)
     private String titulo;
     private String idioma;
+    private Double numeroDownloads;
 
     public Livro(){
 
@@ -31,7 +32,8 @@ public class Livro {
     public Livro(DadosLivro dados, Autor autor){
         this.autor = autor;
         this.titulo = dados.titulo();
-       this.idioma = dados.idioma().isEmpty() ? "Desconhecido" : dados.idioma().get(0);
+        this.idioma = dados.idioma().isEmpty() ? "Desconhecido" : dados.idioma().get(0);
+        this.numeroDownloads = dados.numeroDownloads();
     }
 
     public Long getId() {
@@ -64,6 +66,14 @@ public class Livro {
 
     public void setIdioma(String idioma) {
         this.idioma = idioma;
+    }
+
+    public Double getNumeroDownloads() {
+        return numeroDownloads;
+    }
+
+    public void setNumeroDownloads(Double numeroDownloads) {
+        this.numeroDownloads = numeroDownloads;
     }
 
 }

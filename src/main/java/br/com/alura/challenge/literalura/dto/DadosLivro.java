@@ -12,7 +12,8 @@ public record DadosLivro(
     Long id,
     @JsonAlias("authors") List<DadosAutor> autor,
     @JsonAlias("title") String titulo,
-    @JsonAlias("languages") List<String> idioma
+    @JsonAlias("languages") List<String> idioma,
+    @JsonAlias("download_count") Double numeroDownloads
 
 ) {
 
@@ -27,4 +28,5 @@ public record DadosLivro(
             ----------------------------
             """.formatted(titulo, nomeAutor, idioma.get(0));
     }
+
 }

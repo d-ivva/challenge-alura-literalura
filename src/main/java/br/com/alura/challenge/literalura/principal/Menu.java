@@ -1,10 +1,11 @@
 package br.com.alura.challenge.literalura.principal;
 
-import java.io.IOException;
+import java.util.Optional;
 import java.util.Scanner;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
+import br.com.alura.challenge.literalura.domain.Autor;
+import br.com.alura.challenge.literalura.domain.Livro;
+import br.com.alura.challenge.literalura.dto.DadosAutor;
 import br.com.alura.challenge.literalura.dto.DadosLivro;
 import br.com.alura.challenge.literalura.dto.DadosResultado;
 import br.com.alura.challenge.literalura.repository.AutorRepository;
@@ -80,28 +81,69 @@ public class Menu {
         }
     }
 
-    private void buscarLivro(String tituloLivro) throws Exception {
+private void buscarLivro(String tituloLivro) {
         String endereco = "https://gutendex.com/books?search=" + tituloLivro.trim().replace(" ", "%20");
+        
         try {
-            String jsonlivroBuscado = consumoApi.obterDados(endereco);
-            DadosResultado dados = conversor.converterDados(jsonlivroBuscado, DadosResultado.class);
+            String jsonResultadoBusca = consumoApi.obterDados(endereco);
+            DadosResultado dados = conversor.converterDados(jsonResultadoBusca, DadosResultado.class);
             
-            if (dados.resultadosBusca().isEmpty()){
-                throw new Exception("Busca não retornou resultados.");
+            if (dados.resultadosBusca().isEmpty()) {
+                System.out.println("Poxa, não identificamos esse título na Gutendex.");
+                return; 
+            }
+            
+            DadosLivro dadosLivro = dados.resultadosBusca().get(0);
+            DadosAutor dadosAutor = dadosLivro.autor().get(0);
+            
+            Optional<Autor> autorBuscado = autorRepository.findByNomeIgnoreCase(dadosAutor.nome());
+            
+            Autor autor;
+            if (autorBuscado.isPresent()) {
+                autor = autorBuscado.get();
             } else {
-                DadosLivro livroEncontrado = dados.resultadosBusca().get(0);
-                System.out.println(livroEncontrado);
-            }        
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Erro ao buscar o livro: " + e.getMessage());
+                Autor novoAutor = new Autor(dadosAutor);
+                autor = autorRepository.save(novoAutor);
+            }
+            
+            Livro livro = new Livro(dadosLivro, autor);
+  
+            livroRepository.save(livro);
+            System.out.println(dadosLivro); 
+            
+        } catch (Exception e) {
+            System.out.println("Ops! Aconteceu um erro inesperado: " + e.getMessage());
         }
     }
 
     private void listarTodosLivros() {
+        var livros = livroRepository.findAll();
 
+        if (livros.isEmpty()) {
+            System.out.println("Não há livros cadastrados.");
+        } else {
+            for (Livro livro : livros) {
+                System.out.printf("Título: %s | Autor: %s | Idioma: %s\n", 
+                        livro.getTitulo(), 
+                        livro.getAutor().getNome(), 
+                        livro.getIdioma());
+            }
+        }
     }
 
     private void listarTodosAutores() {
+        var autores = autorRepository.findAll();
+
+        if (autores.isEmpty()) {
+            System.out.println("Não há autores cadastrados.");
+        } else {
+            for (Autor autor : autores) {
+                System.out.printf("Nome: %s | Nascimento: %s | Falecimento: %s\n", 
+                        autor.getNome(), 
+                        autor.getAnoNascimento(), 
+                        autor.getAnoFalecimento());
+            }
+        }
     }
 
     private void listarAutoresNoAno(int ano) {
