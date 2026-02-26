@@ -16,4 +16,15 @@ public record DadosLivro(
 
 ) {
 
+    @Override
+    public String toString() {
+        String nomeAutor = autor.isEmpty() ? "Autor desconhecido" : autor.get(0).nome();
+        return """
+            \n----- LIVRO ENCONTRADO -----
+            Título: %s
+            Autor (es): %s
+            Idioma: %s
+            ----------------------------
+            """.formatted(titulo, nomeAutor, idioma.get(0));
+    }
 }

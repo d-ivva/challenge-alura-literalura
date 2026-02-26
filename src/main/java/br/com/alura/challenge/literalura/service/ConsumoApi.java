@@ -7,7 +7,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class ConsumoApi {
-
     public String obterDados (String url) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)
