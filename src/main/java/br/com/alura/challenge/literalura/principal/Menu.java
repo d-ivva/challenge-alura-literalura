@@ -3,16 +3,29 @@ package br.com.alura.challenge.literalura.principal;
 import java.io.IOException;
 import java.util.Scanner;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import br.com.alura.challenge.literalura.dto.DadosLivro;
 import br.com.alura.challenge.literalura.dto.DadosResultado;
+import br.com.alura.challenge.literalura.repository.AutorRepository;
+import br.com.alura.challenge.literalura.repository.LivroRepository;
 import br.com.alura.challenge.literalura.service.ConsumoApi;
 import br.com.alura.challenge.literalura.service.ConverteDados;
 
 public class Menu {
     private Scanner entrada = new Scanner(System.in);
     private int opcao;
+
     private ConsumoApi consumoApi = new ConsumoApi();
     private ConverteDados conversor = new ConverteDados();
+
+    private AutorRepository autorRepository;
+    private LivroRepository livroRepository;
+
+    public Menu(LivroRepository livroRepository, AutorRepository autorRepository) {
+        this.livroRepository = livroRepository;
+        this.autorRepository = autorRepository;
+    }
 
     public void exibirMenu() throws Exception {
         String menu = """

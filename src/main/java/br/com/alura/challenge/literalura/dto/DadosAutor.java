@@ -8,8 +8,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public record DadosAutor(
 
     @JsonAlias("name") String nome,
-    @JsonAlias("birth_year") String anoNascimento,
-    @JsonAlias("death_year") String anoFalecimento
+    @JsonAlias("birth_year") Integer anoNascimento,
+    @JsonAlias("death_year") Integer anoFalecimento
 ) {
 
     @Override
