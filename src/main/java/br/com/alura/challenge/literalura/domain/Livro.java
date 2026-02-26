@@ -76,4 +76,16 @@ public class Livro {
         this.numeroDownloads = numeroDownloads;
     }
 
+    @Override
+    public String toString() {
+        return """
+                ----- LIVRO -----
+                Título: %s
+                Autor: %s
+                Idioma: %s
+                Downloads: %.0f
+                -----------------
+                """.formatted(titulo, autor.getNome(), idioma, numeroDownloads);
+    }
+
 }

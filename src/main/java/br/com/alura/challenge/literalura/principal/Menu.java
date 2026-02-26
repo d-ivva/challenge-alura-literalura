@@ -1,5 +1,6 @@
 package br.com.alura.challenge.literalura.principal;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -62,13 +63,19 @@ public class Menu {
                     break;
                 case 4:
                     System.out.println("Insira o ano desejado para busca: ");
-                    int ano = entrada.nextInt();
+                    int ano = Integer.valueOf(entrada.nextLine());
                     listarAutoresNoAno(ano);
                     break;
                 case 5:
-                    System.out.println("Insira o idioma desejado: ");
+                    System.out.println("""
+                        Insira o idioma para realizar a busca:
+                        es - espanhol
+                        en - inglês
+                        fr - francês
+                        pt - português
+                        """);
                     String idioma = entrada.nextLine();
-                    buscarLivrosIdioma(idioma);
+                    buscarLivrosPorIdioma(idioma);
                     break;
                 case 0:
                     System.out.println("Até a próxima! Encerrando o sistema...");
@@ -89,11 +96,19 @@ private void buscarLivro(String tituloLivro) {
             DadosResultado dados = conversor.converterDados(jsonResultadoBusca, DadosResultado.class);
             
             if (dados.resultadosBusca().isEmpty()) {
-                System.out.println("Poxa, não identificamos esse título na Gutendex.");
+                System.out.println("Não identificamos esse título na Gutendex.");
                 return; 
             }
             
             DadosLivro dadosLivro = dados.resultadosBusca().get(0);
+
+            Optional<Livro> livroExistente = livroRepository.findByTituloIgnoreCase(dadosLivro.titulo());
+            
+            if (livroExistente.isPresent()) {
+                System.out.println("\nO livro '" + dadosLivro.titulo() + "' já está cadastrado no nosso sistema!");
+                return;
+            }
+            
             DadosAutor dadosAutor = dadosLivro.autor().get(0);
             
             Optional<Autor> autorBuscado = autorRepository.findByNomeIgnoreCase(dadosAutor.nome());
@@ -117,16 +132,22 @@ private void buscarLivro(String tituloLivro) {
     }
 
     private void listarTodosLivros() {
-        var livros = livroRepository.findAll();
+        var livros = livroRepository.findAllByOrderByTituloAsc();
 
         if (livros.isEmpty()) {
             System.out.println("Não há livros cadastrados.");
         } else {
+            System.out.println("\n--- TODOS OS LIVROS CADASTRADOS ---");
             for (Livro livro : livros) {
-                System.out.printf("Título: %s | Autor: %s | Idioma: %s\n", 
-                        livro.getTitulo(), 
+                var livroImpressao = """
+                        Título: %s
+                        Autor: %s 
+                        Idioma: %s
+                        Downloads: %.0f
+                        """.formatted(livro.getTitulo(), 
                         livro.getAutor().getNome(), 
-                        livro.getIdioma());
+                        livro.getIdioma(), livro.getNumeroDownloads());
+                System.out.println(livroImpressao);
             }
         }
     }
@@ -137,8 +158,9 @@ private void buscarLivro(String tituloLivro) {
         if (autores.isEmpty()) {
             System.out.println("Não há autores cadastrados.");
         } else {
+            System.out.println("\n--- TODOS OS AUTORES CADASTRADOS ---");
             for (Autor autor : autores) {
-                System.out.printf("Nome: %s | Nascimento: %s | Falecimento: %s\n", 
+                System.out.printf("\nNome: %s \nNascimento: %s \nFalecimento: %s\n", 
                         autor.getNome(), 
                         autor.getAnoNascimento(), 
                         autor.getAnoFalecimento());
@@ -147,11 +169,36 @@ private void buscarLivro(String tituloLivro) {
     }
 
     private void listarAutoresNoAno(int ano) {
-       
+        try {
+        List<Autor> autores = autorRepository.buscarAutoresVivosNoAno(ano);
+
+            if (autores.isEmpty()) {
+                System.out.println("\nNenhum autor vivo encontrado no ano " + ano + " na base de dados.");
+            } else {
+                System.out.println("\n--- AUTORES VIVOS NO ANO " + ano + " ---");
+                for (Autor autor : autores) {
+                    System.out.printf("\nNome: %s \nNascimento: %s \nFalecimento: %s\n", 
+                            autor.getNome(), 
+                            autor.getAnoNascimento(), 
+                            autor.getAnoFalecimento() != null ? autor.getAnoFalecimento() : "Desconhecido");
+                }
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Ano inválido. Tente novamente.");
+        }
     }
 
-    private void buscarLivrosIdioma(String idioma) {
-        
+    private void buscarLivrosPorIdioma(String idioma) {
+        List<Livro> livros = livroRepository.findByIdioma(idioma);
+        if (livros.isEmpty()) {
+            System.out.println("\nNão existem livros registados nesse idioma na base de dados.");
+        } else {
+            System.out.println("\n--- LIVROS ENCONTRADOS NO IDIOMA '" + idioma + "' ---");
+            for (Livro livro : livros) {
+                System.out.println(livro);
+            }
+        }
     }
 
 }
+

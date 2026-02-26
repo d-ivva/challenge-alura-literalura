@@ -15,11 +15,9 @@ public record DadosAutor(
     @Override
     public String toString() {
         return """
-                ----- AUTOR ENCONTRADO -----
                 Nome: %s
                 Ano de Nascimento: %s
                 Ano de Falecimento: %s
-                ----------------------------
                 """.formatted(nome, anoNascimento, anoFalecimento);
     }
 }
