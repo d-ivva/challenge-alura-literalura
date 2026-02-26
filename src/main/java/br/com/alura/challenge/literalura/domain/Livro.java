@@ -79,12 +79,10 @@ public class Livro {
     @Override
     public String toString() {
         return """
-                ----- LIVRO -----
-                Título: %s
+                \nTítulo: %s
                 Autor: %s
                 Idioma: %s
                 Downloads: %.0f
-                -----------------
                 """.formatted(titulo, autor.getNome(), idioma, numeroDownloads);
     }
 

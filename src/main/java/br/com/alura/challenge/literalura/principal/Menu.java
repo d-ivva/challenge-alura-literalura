@@ -193,7 +193,9 @@ private void buscarLivro(String tituloLivro) {
         if (livros.isEmpty()) {
             System.out.println("\nNão existem livros registados nesse idioma na base de dados.");
         } else {
-            System.out.println("\n--- LIVROS ENCONTRADOS NO IDIOMA '" + idioma + "' ---");
+            int quantidadeLivrosNoIdioma = livros.size();
+            String impressao = quantidadeLivrosNoIdioma == 1 ? " LIVRO ENCONTRADO" : " LIVROS ENCONTRADOS";
+            System.out.println("\n--- " + quantidadeLivrosNoIdioma + impressao + " NO IDIOMA '" + idioma + "' ---");
             for (Livro livro : livros) {
                 System.out.println(livro);
             }
